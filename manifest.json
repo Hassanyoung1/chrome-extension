@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Content Summarizer and Highlight Extractor",
+  "version": "1.0",
+  "description": "Summarize content and extract highlights from webpages.",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "http://localhost:3000/*",
+    "activeTab",
+    "storage",
+    "scripting"
+  ]
+}
