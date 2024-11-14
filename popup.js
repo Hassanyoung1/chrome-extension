@@ -6,11 +6,10 @@ document.addEventListener('DOMContentLoaded', function () {
         chrome.scripting.executeScript({
           target: { tabId: tabId },
           func: () => {
-            // Get selected text from the page
             function getSelectedText() {
               return window.getSelection().toString();
             }
-            return getSelectedText();  // Return selected text to the popup
+            return getSelectedText();
           }
         }).then((injectionResults) => {
           if (injectionResults && injectionResults[0] && injectionResults[0].result) {
@@ -30,23 +29,38 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
-// Function to send the text to the server for summarization
-function summarizeText(text) {
-  const data = {
-    prompt: `Summarize this: ${text}`,
-    max_tokens: 50,
-    temperature: 0.7,
-  };
-  console.log("Data sent to server:", data);
 
-  axios.post('http://localhost:3000/proxy-gemini', data)  // Update endpoint here
-    .then(response => {
-      const summary = response.data.summary;
-      console.log("Summary:", summary);
-      alert(`Summary:\n\n${summary}`);
-    })
-    .catch(error => {
-      console.error("Error summarizing text:", error);
-      alert("There was an error summarizing the text. Please try again.");
+async function summarizeText(text) {
+  try {
+    console.log("I'm here");
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "contents": [
+          {
+            "parts": [
+              {
+                "text": text
+              }
+            ]
+          }
+        ]
+      })
     });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    const summary = data.candidates[0].content.parts[0].text;
+    console.log("Summary:", summary);
+    alert(`Summary:\n\n${summary}`);
+  } catch (error) {
+    console.error("Error summarizing text:", error);
+    alert("There was an error summarizing the text. Please try again. Error: " + error.message);
+  }
 }

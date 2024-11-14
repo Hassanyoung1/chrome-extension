@@ -10,7 +10,6 @@
     "default_popup": "popup.html"
   },
   "permissions": [
-    "http://localhost:3000/*",
     "activeTab",
     "storage",
     "scripting"

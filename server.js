@@ -1,43 +1,36 @@
-import express from 'express';
-import axios from 'axios';
-import cors from 'cors';  // Import the CORS middleware
+const express = require('express');
+const bodyParser = require('body-parser');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+
 const app = express();
+const port = 3000;
 
-app.use(cors());  // Enable CORS for all routes
-app.use(express.json());  // For parsing JSON request bodies
+// Replace with your project ID and service account key
+const projectId = 157002040916;
+const keyFilename = './gen-lang-client-0947300022-01ef8a12e5d2.json'
+app.use(bodyParser.json());
 
+app.post('/summarize', async (req, res) => {
+  const { text } = req.body;
+  text = `summarize not more than the word highlighted: ${text}`;
 
-const apiKey = process.env.API_KEY;
-// Define the proxy route
-app.post('http://localhost:3000/proxy-gemini', (req, res) => {
-  const { prompt, max_tokens, temperature } = req.body;
+  const genAI = new GoogleGenerativeAI({
+    projectId: projectId,
+    keyFilename: keyFilename
+  });
 
-  
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-  // Make the request to the Gemini API
-  axios.post('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent', {
-    model: 'gemini-1.5-flash',
-    prompt: prompt,
-    max_tokens: max_tokens,
-    temperature: temperature,
-  }, {
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,  // Replace with your actual API key
-      'Content-Type': 'application/json',
-    }
-  })
-    .then(response => {
-      // Send the result back to the client (your extension)
-      res.json({ summary: response.data.candidates[0].output });
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      res.status(500).json({ error: 'Error forwarding request to Gemini API' });
-    });
+  try {
+    const result = await model.generateContent(prompt);
+    const summary = result.response.text();
+    res.json({ summary });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: 'Error summarizing text' });
+  }
 });
 
-// Start the server
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Proxy server is running on http://localhost:${PORT}`);
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
 });
