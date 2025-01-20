@@ -73,4 +73,4 @@ Contributions are welcome! Feel free to submit issues or pull requests to improv
 This project is licensed under the MIT License.
 
 ## Contact
-For questions or suggestions, please reach out to Hassan Olaoluwa at [hhassanhakeem@gmail.com](mailto:hhassanhakeem@gmail.com).
+For questions or suggestions, please reach out to Hassan Olaoluwa at [hhassanhakeem@gmail.com](mailto:hhassanhakeem@gmail.com)
